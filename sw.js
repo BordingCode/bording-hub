@@ -1,6 +1,6 @@
 /* Bording Hub service worker — installable PWA + offline shell.
    Bump CACHE on every deploy so browsers fetch fresh files. */
-const CACHE = 'bording-hub-v1';
+const CACHE = 'bording-hub-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
