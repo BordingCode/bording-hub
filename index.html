@@ -104,6 +104,7 @@
     // Inline line-icons (stroke = currentColor) — render identically everywhere, no emoji/icon-font needed.
     const ICONS = {
       atom:'<circle cx="12" cy="12" r="2.2"/><ellipse cx="12" cy="12" rx="10" ry="4.4"/><ellipse cx="12" cy="12" rx="10" ry="4.4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.4" transform="rotate(120 12 12)"/>',
+      bird:'<path d="M3 13c3-2.5 6-2.5 9 0M3 13c3 2.5 6 2.5 9 0M21 9c-3-2.5-6-2.5-9 0M21 9c-3 2.5-6 2.5-9 0"/>',
       flame:'<path d="M12 21a6 6 0 0 0 6-6c0-4-4-6-4.5-10C11 7 11 9 9.5 10.5 8.7 9.8 8.5 8.6 8.5 7.6 6.8 9 6 11.5 6 15a6 6 0 0 0 6 6z"/>',
       banner:'<path d="M6 21V4M6 5h12l-3 4 3 4H6"/>',
       anchor:'<circle cx="12" cy="5" r="2.4"/><path d="M12 7.4V21M5 13a7 7 0 0 0 14 0M4 13h3M17 13h3"/>',
@@ -130,6 +131,7 @@
     // Each section has ONE accent colour. Edit lists to add/remove projects.
     const SECTIONS = [
       { title: 'Spil', accent: '#34f5ff', items: [
+        { name: 'Sort Sol', icon: 'bird', desc: 'Før en sort sol af stære gennem skumringen — hold sværmen samlet, vandrefalken tager de ensomme.', url: 'https://bordingcode.github.io/sort-sol/' },
         { name: 'Primordia', icon: 'atom', desc: 'Kemi-puslespil — smed rigtige grundstoffer, bind molekyler, dyrk en død verden til liv.', url: 'https://bordingcode.github.io/primordia/' },
         { name: 'ASTRA', icon: 'orbit', desc: 'Fysik-rejse i 7 trin — fra en støvfnug i mørket til lys og farver. Forudsig bevægelsen, se den ægte simulation give dig ret (eller lære dig noget), med levende formler og gentaget træning. Søsterspil til Primordia.', url: 'https://bordingcode.github.io/astra/' },
         { name: 'Emberlock', icon: 'flame', desc: 'Arena-brawler — skub rivaliserende troldmænd i lavaen før øen synker.', url: 'https://bordingcode.github.io/emberlock/' },
