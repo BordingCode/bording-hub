@@ -155,9 +155,9 @@
             <div class="tag">besøg &amp; enheder &middot; siden måling startede</div>
           </header>
           <div class="seg" id="seg">
-            <button type="button" data-w="d1">Seneste 24t</button>
+            <button type="button" data-w="d1" class="on">Seneste 24t</button>
             <button type="button" data-w="d7">7 dage</button>
-            <button type="button" data-w="all" class="on">I alt</button>
+            <button type="button" data-w="all">I alt</button>
           </div>
           <div class="totals">
             <div class="tot" style="--c:var(--cyan)"><div class="num" id="tot-visits">–</div><div class="lbl" id="lbl-visits">Besøg i alt</div></div>
@@ -348,7 +348,7 @@
     window.__bhResize = function () { if (!onStats) setHeight(); };
 
     var statsData = null;     // last fetched {windows:{all,d1,d7}, ...}
-    var curWin = 'all';       // 'all' | 'd1' | 'd7'
+    var curWin = 'd1';        // 'all' | 'd1' | 'd7'
     var WIN_LBL = { all: 'i alt', d1: '· 24 timer', d7: '· 7 dage' };
 
     function paintStats() {
