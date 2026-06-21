@@ -22,4 +22,4 @@ self.addEventListener('fetch', (e) => {
   );
 });
 
-// hub-stats tracker v4 (slide back)
+// hub-stats tracker v5 (time windows)

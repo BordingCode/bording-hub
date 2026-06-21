@@ -120,6 +120,12 @@
     .note { color: var(--muted); font-size: 12.5px; line-height: 1.55; margin: 18px 4px 0; }
     .note b { color: var(--ink); }
     .state { text-align: center; color: var(--muted); padding: 40px 0; line-height: 1.5; }
+    .seg { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 18px; }
+    .seg button { font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .04em;
+      color: var(--muted); background: var(--panel); border: 1px solid var(--edge); border-radius: 999px;
+      padding: 8px 16px; cursor: pointer; transition: .15s; }
+    .seg button:hover { color: var(--ink); border-color: var(--cyan); }
+    .seg button.on { color: #05030f; background: var(--cyan); border-color: var(--cyan); }
   </style>
 </head>
 <body>
@@ -148,9 +154,14 @@
             <div class="logo" style="font-size:clamp(26px,7vw,40px)">STATISTIK</div>
             <div class="tag">besøg &amp; enheder &middot; siden måling startede</div>
           </header>
+          <div class="seg" id="seg">
+            <button type="button" data-w="d1">Seneste 24t</button>
+            <button type="button" data-w="d7">7 dage</button>
+            <button type="button" data-w="all" class="on">I alt</button>
+          </div>
           <div class="totals">
-            <div class="tot" style="--c:var(--cyan)"><div class="num" id="tot-visits">–</div><div class="lbl">Besøg i alt</div></div>
-            <div class="tot" style="--c:var(--violet)"><div class="num" id="tot-devices">–</div><div class="lbl">Enheder i alt</div></div>
+            <div class="tot" style="--c:var(--cyan)"><div class="num" id="tot-visits">–</div><div class="lbl" id="lbl-visits">Besøg i alt</div></div>
+            <div class="tot" style="--c:var(--violet)"><div class="num" id="tot-devices">–</div><div class="lbl" id="lbl-devices">Enheder i alt</div></div>
           </div>
           <div class="tablebox" id="stats-box"><div class="state">Henter tal …</div></div>
           <p class="note">
@@ -158,7 +169,8 @@
             browsere/telefoner, der har åbnet den (uden cookies, uden personlige data —
             hver enhed får bare et tilfældigt id). Samme telefon, der åbner to forskellige
             apps, tæller som én enhed i hver — så «Enheder i alt» er summen pr. app, ikke
-            unikke mennesker. Målingen startede, da tælleren blev sat op.
+            unikke mennesker. Brug knapperne foroven til at skifte mellem seneste 24 timer,
+            7 dage og i alt. Målingen startede, da tælleren blev sat op.
           </p>
           <footer id="updated"></footer>
         </div>
@@ -333,14 +345,26 @@
     // let the hub's render() ask us to re-measure (e.g. when edit mode changes height)
     window.__bhResize = function () { if (!onStats) setHeight(); };
 
-    function renderStats(data) {
-      document.getElementById('tot-visits').textContent = nf.format(data.totals.visits);
-      document.getElementById('tot-devices').textContent = nf.format(data.totals.devices);
+    var statsData = null;     // last fetched {windows:{all,d1,d7}, ...}
+    var curWin = 'all';       // 'all' | 'd1' | 'd7'
+    var WIN_LBL = { all: 'i alt', d1: '· 24 timer', d7: '· 7 dage' };
+
+    function paintStats() {
+      if (!statsData) return;
+      var w = (statsData.windows && statsData.windows[curWin]) ||
+              { totals: statsData.totals, apps: statsData.apps };
+      document.getElementById('tot-visits').textContent = nf.format(w.totals.visits);
+      document.getElementById('tot-devices').textContent = nf.format(w.totals.devices);
+      document.getElementById('lbl-visits').textContent = 'Besøg ' + WIN_LBL[curWin];
+      document.getElementById('lbl-devices').textContent = 'Enheder ' + WIN_LBL[curWin];
+
       var box = document.getElementById('stats-box');
-      if (!data.apps.length) {
-        box.innerHTML = '<div class="state">Ingen besøg registreret endnu.<br>Tallene dukker op, så snart nogen åbner en app.</div>';
+      if (!w.apps.length) {
+        box.innerHTML = curWin === 'all'
+          ? '<div class="state">Ingen besøg registreret endnu.<br>Tallene dukker op, så snart nogen åbner en app.</div>'
+          : '<div class="state">Ingen besøg i denne periode.</div>';
       } else {
-        var rows = data.apps.map(function (a, i) {
+        var rows = w.apps.map(function (a, i) {
           var name = NAMES[a.app] || a.app;
           return '<tr><td class="name"><span class="rank">' + (i + 1) + '</span>' + name + '</td>' +
                  '<td class="v">' + nf.format(a.visits) + '</td>' +
@@ -357,13 +381,24 @@
     function loadStats() {
       fetch(API, { cache: 'no-store' })
         .then(function (r) { if (!r.ok) throw 0; return r.json(); })
-        .then(renderStats)
+        .then(function (data) { statsData = data; paintStats(); })
         .catch(function () {
           document.getElementById('stats-box').innerHTML =
             '<div class="state">Kunne ikke hente tal lige nu. Prøv at slide tilbage og frem igen.</div>';
           if (onStats) setHeight();
         });
     }
+
+    // window toggle (24t / 7 dage / i alt)
+    document.getElementById('seg').addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-w]');
+      if (!btn) return;
+      curWin = btn.getAttribute('data-w');
+      Array.prototype.forEach.call(this.querySelectorAll('button'), function (b) {
+        b.classList.toggle('on', b === btn);
+      });
+      paintStats();
+    });
 
     function go(stats) {
       if (stats === onStats) { setHeight(); return; }
