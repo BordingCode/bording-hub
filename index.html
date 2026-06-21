@@ -98,7 +98,7 @@
     <div class="controls" id="controls"></div>
     <div class="edit-hint" id="edit-hint" hidden>Tryk <b>Aktiv / Passiv</b> på hvert projekt for at vælge, hvad der vises på forsiden.</div>
     <div id="sections"></div>
-    <footer>Lavet af Bording &middot; <span id="count"></span> projekter</footer>
+    <footer>Lavet af Bording &middot; <span id="count"></span> projekter &middot; <a href="stats.html" style="color:inherit;text-decoration:none;opacity:.55;border-bottom:1px dotted var(--edge)">stats</a></footer>
   </div>
   <script>
     // Inline line-icons (stroke = currentColor) — render identically everywhere, no emoji/icon-font needed.
@@ -234,5 +234,7 @@
       window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
     }
   </script>
+  <!-- hub-stats visit counter -->
+  <script>(function(){try{var A="bording-hub",K="hubdev",d=localStorage.getItem(K);if(!d){d=(self.crypto&&crypto.randomUUID?crypto.randomUUID():Date.now()+"."+Math.random().toString(36).slice(2));localStorage.setItem(K,d);}var u="https://hub-stats.mathiasjob.workers.dev/hit",b=JSON.stringify({app:A,d:d});if(navigator.sendBeacon){navigator.sendBeacon(u,new Blob([b],{type:"application/json"}));}else{fetch(u,{method:"POST",body:b,headers:{"Content-Type":"application/json"},keepalive:true,mode:"no-cors"});}}catch(e){}})();</script>
 </body>
 </html>
