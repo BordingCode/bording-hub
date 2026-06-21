@@ -366,21 +366,24 @@
     }
 
     function go(stats) {
+      if (stats === onStats) { setHeight(); return; }
       onStats = stats;
       track.classList.toggle('show-stats', stats);
       if (stats) loadStats();
       setHeight();
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
     }
-    function toStats() { location.hash = 'stats'; }
-    function toHub() {
-      if (location.hash === '#stats' && history.length > 1) history.back();
-      else location.hash = '';
+    // keep the URL in sync without relying on quirky hash-clearing or the history stack
+    function syncHash(stats) {
+      try { history.replaceState(null, '', stats ? '#stats' : (location.pathname + location.search)); } catch (e) {}
     }
+    function toStats() { go(true); syncHash(true); }
+    function toHub()   { go(false); syncHash(false); }
 
     document.getElementById('to-stats').addEventListener('click', function (e) { e.preventDefault(); toStats(); });
     document.getElementById('to-hub').addEventListener('click', function (e) { e.preventDefault(); toHub(); });
-    window.addEventListener('hashchange', function () { go(location.hash === '#stats'); });
+    // react to external hash changes (e.g. the stats.html redirect, or a pasted #stats link)
+    window.addEventListener('hashchange', function () { var s = location.hash === '#stats'; go(s); syncHash(s); });
     window.addEventListener('resize', setHeight);
     window.addEventListener('load', setHeight);
 

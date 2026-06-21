@@ -22,4 +22,4 @@ self.addEventListener('fetch', (e) => {
   );
 });
 
-// hub-stats tracker v3 (slide stats)
+// hub-stats tracker v4 (slide back)
