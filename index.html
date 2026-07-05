@@ -206,13 +206,15 @@
       wave:'<path d="M3 9c1.8-2 3.6-2 5.4 0s3.6 2 5.4 0 3.6-2 5.4 0M3 14c1.8-2 3.6-2 5.4 0s3.6 2 5.4 0 3.6-2 5.4 0"/>',
       book:'<path d="M12 6c-2-1.4-5-1.4-7-.4V18c2-1 5-1 7 .4 2-1.4 5-1.4 7-.4V5.6c-2-1-5-1-7 .4zM12 6v12"/>',
       hex:'<path d="M12 3l7 4.5v9L12 21l-7-4.5v-9z"/><path d="M9 10.5l3 3 3-3M9 14l3 3 3-3"/>',
-      tag:'<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.4" fill="currentColor"/>'
+      tag:'<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.4" fill="currentColor"/>',
+      paw:'<ellipse cx="12" cy="15.5" rx="4.6" ry="3.8"/><circle cx="5.8" cy="10.5" r="1.9"/><circle cx="9.6" cy="7.2" r="1.9"/><circle cx="14.4" cy="7.2" r="1.9"/><circle cx="18.2" cy="10.5" r="1.9"/>'
     };
     const svg = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[k] || ICONS.star}</svg>`;
 
     // Each section has ONE accent colour. Edit lists to add/remove projects.
     const SECTIONS = [
       { title: 'Spil', accent: '#34f5ff', items: [
+        { name: 'Cute Fight', icon: 'paw', desc: 'Monster-brawler med hjemmelavet pixel-art — kæmp i realtid, gør vilde monstre fortumlede og fang dem med en perfekt timet kugle. Men slå ikke for hårdt: så besvimer de, og fangsten er tabt! Spilles på mobilen i landskab.', url: 'https://bordingcode.github.io/cutefight/' },
         { name: 'Hexfall', icon: 'hex', desc: 'Troldmands-taktik — du angriber aldrig selv; du skubber og trækker fjender ud i fælderne. Vælg en disciplin der ændrer dine trylleformularer, udløs kædereaktioner (olie, tønder, is) og styrt ned gennem tårnet. Nye runs låser nyt indhold op — aldrig rå styrke.', url: 'https://bordingcode.github.io/hexfall/' },
         { name: 'Højvande', icon: 'wave', desc: 'Tur-baseret taktik — skub havuhyrer i det stigende tidevand, før det også tager din egen besætning. Alt er varslet: ingen død er tilfældig. Perfekt information, ægte indsats.', url: 'https://bordingcode.github.io/hojvande/' },
         { name: 'Sort Sol', icon: 'bird', desc: 'Før en sort sol af stære gennem skumringen — hold sværmen samlet, vandrefalken tager de ensomme.', url: 'https://bordingcode.github.io/sort-sol/' },
