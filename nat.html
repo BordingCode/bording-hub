@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex" />
+<title>Natholdet · Bording Hub</title>
+<meta name="theme-color" content="#05030f" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2305030f'/%3E%3Cpath d='M22 20a8 8 0 01-10-10 9 9 0 1010 10z' fill='%23ffd166'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#05030f; --ink:#eaf2ff; --muted:#9aa6d6;
+    --cyan:#34f5ff; --violet:#9d6bff; --magenta:#ff4d9d; --gold:#ffd166; --green:#5dffb0; --red:#ff6b6b;
+    --panel:rgba(255,255,255,.04); --edge:rgba(255,255,255,.10);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{
+    font-family:'Rajdhani',system-ui,sans-serif; color:var(--ink); background:var(--bg);
+    min-height:100svh;
+    padding:calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 40px);
+    background:radial-gradient(120% 70% at 50% 0%,rgba(40,28,90,.55),rgba(5,3,15,.96) 70%),var(--bg);
+  }
+  .wrap{max-width:720px;margin:0 auto}
+  a{color:var(--cyan)}
+
+  header{text-align:center;margin-bottom:18px}
+  .logo{font-family:'Orbitron',sans-serif;font-weight:900;letter-spacing:.12em;font-size:clamp(26px,7vw,40px);
+    background:linear-gradient(180deg,#fff2cc 0%,var(--gold) 45%,var(--violet) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 20px rgba(255,209,102,.35))}
+  .tag{color:var(--muted);letter-spacing:.24em;text-transform:uppercase;font-size:11px;margin-top:6px}
+  .back{display:inline-block;margin-top:10px;color:var(--muted);text-decoration:none;font-size:13px}
+
+  /* ---- gate ---- */
+  #gate{max-width:340px;margin:14vh auto 0;text-align:center}
+  #gate input{width:100%;padding:14px;border-radius:14px;border:0;box-shadow:inset 0 0 0 1px var(--edge);
+    background:var(--panel);color:var(--ink);font:inherit;font-size:17px;text-align:center;letter-spacing:.08em}
+  #gate button{margin-top:12px;width:100%}
+  .err{color:var(--red);font-size:14px;min-height:20px;margin-top:10px}
+
+  button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:14px;padding:12px 16px;
+    background:var(--panel);box-shadow:inset 0 0 0 1px var(--edge);color:var(--ink);transition:transform .1s,background .2s}
+  button:active{transform:scale(.97)}
+  button.primary{background:linear-gradient(135deg,rgba(52,245,255,.22),rgba(157,107,255,.22));box-shadow:inset 0 0 0 1px rgba(52,245,255,.5)}
+  button.yes{background:rgba(93,255,176,.14);box-shadow:inset 0 0 0 1px rgba(93,255,176,.45);color:#c9ffe6}
+  button.no{background:rgba(255,107,107,.12);box-shadow:inset 0 0 0 1px rgba(255,107,107,.4);color:#ffd9d9}
+  button:disabled{opacity:.45;cursor:default}
+
+  /* ---- status strip ---- */
+  .strip{background:var(--panel);box-shadow:inset 0 0 0 1px var(--edge);border-radius:18px;padding:14px 16px;margin-bottom:14px}
+  .meters{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+  .meter .lbl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between}
+  .bar{height:8px;border-radius:99px;background:rgba(255,255,255,.07);margin-top:6px;overflow:hidden}
+  .bar > i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .4s}
+  .bar > i.hot{background:linear-gradient(90deg,var(--gold),var(--red))}
+  .ceiling{font-size:11px;color:var(--muted);margin-top:6px}
+  .shiftline{font-size:14px;color:var(--muted);margin:8px 0 12px;line-height:1.45}
+  .strip .row{display:flex;gap:10px}
+  .strip .row button{flex:1;padding:10px}
+
+  /* ---- tabs ---- */
+  .tabs{display:flex;gap:8px;margin:16px 0 14px}
+  .tabs button{flex:1;padding:11px 8px;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+  .tabs button[aria-selected="true"]{background:linear-gradient(135deg,rgba(255,209,102,.2),rgba(157,107,255,.2));box-shadow:inset 0 0 0 1px rgba(255,209,102,.5)}
+  .badge{display:inline-block;min-width:18px;padding:0 5px;margin-left:6px;border-radius:99px;background:var(--gold);color:#1a1206;font-size:11px;font-weight:800}
+
+  /* ---- cards ---- */
+  .card{background:var(--panel);box-shadow:inset 0 0 0 1px var(--edge);border-radius:18px;padding:16px;margin-bottom:14px}
+  .card.fjern{box-shadow:inset 0 0 0 1px rgba(157,107,255,.35);background:linear-gradient(180deg,rgba(157,107,255,.07),rgba(255,255,255,.03))}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .chip{font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:99px;
+    background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px var(--edge);color:var(--muted)}
+  .chip.proj{color:var(--cyan);box-shadow:inset 0 0 0 1px rgba(52,245,255,.4)}
+  .chip.fjern{color:var(--violet);box-shadow:inset 0 0 0 1px rgba(157,107,255,.5)}
+  .chip.naer{color:var(--muted)}
+  .chip.live{color:#0d2b1c;background:var(--green);font-weight:800}
+  .chip.ok{color:var(--green);box-shadow:inset 0 0 0 1px rgba(93,255,176,.5)}
+  .chip.bad{color:var(--red);box-shadow:inset 0 0 0 1px rgba(255,107,107,.5)}
+  h3{margin:0 0 8px;font-size:19px;line-height:1.3}
+  .pitch{color:#cfd8f5;line-height:1.5;margin:0 0 12px;font-size:16px}
+  details{margin:0 0 12px}
+  details summary{cursor:pointer;color:var(--muted);font-size:14px;letter-spacing:.04em;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:'▸ ';color:var(--gold)}
+  details[open] summary::before{content:'▾ '}
+  .detail{margin-top:10px;font-size:15px;line-height:1.5;color:#c3cdec}
+  .detail h4{margin:12px 0 4px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+  .detail code{background:rgba(0,0,0,.35);padding:2px 5px;border-radius:5px;font-size:13px;word-break:break-word}
+  .ev{background:rgba(0,0,0,.25);border-radius:10px;padding:8px 10px;margin-top:6px;font-size:13px;color:#aab6dd;word-break:break-word}
+  .acts{display:flex;gap:8px;flex-wrap:wrap}
+  .acts button{flex:1;min-width:96px}
+  .commentbox{margin-top:10px;display:none}
+  .commentbox.open{display:block}
+  .commentbox textarea{width:100%;min-height:80px;padding:12px;border-radius:12px;border:0;
+    box-shadow:inset 0 0 0 1px var(--edge);background:rgba(0,0,0,.3);color:var(--ink);font:inherit;font-size:16px;resize:vertical}
+  .said{margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(255,209,102,.08);
+    box-shadow:inset 0 0 0 1px rgba(255,209,102,.25);font-size:14px;line-height:1.45}
+  .said b{color:var(--gold);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+
+  /* ---- focus list ---- */
+  .prow{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--panel);
+    box-shadow:inset 0 0 0 1px var(--edge);margin-bottom:8px}
+  .prow .nm{flex:1;min-width:0}
+  .prow .nm b{display:block;font-size:16px}
+  .prow .nm small{color:var(--muted);font-size:12px}
+  .sw{width:52px;height:30px;border-radius:99px;background:rgba(255,255,255,.1);position:relative;flex:none;
+    cursor:pointer;transition:background .2s;box-shadow:inset 0 0 0 1px var(--edge)}
+  .sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;
+    background:#8b96c0;transition:transform .2s,background .2s}
+  .sw.on{background:rgba(93,255,176,.25);box-shadow:inset 0 0 0 1px rgba(93,255,176,.5)}
+  .sw.on::after{transform:translateX(22px);background:var(--green)}
+  .noteline{margin:-4px 0 10px;padding:0 4px}
+  .noteline input{width:100%;padding:10px 12px;border-radius:12px;border:0;box-shadow:inset 0 0 0 1px var(--edge);
+    background:rgba(0,0,0,.25);color:var(--ink);font:inherit;font-size:15px}
+  .grouphead{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--gold);margin:20px 4px 10px;display:flex;align-items:center;gap:10px}
+  .grouphead::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--edge),transparent)}
+
+  .empty{text-align:center;color:var(--muted);padding:40px 20px;line-height:1.6}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 20px);
+    background:rgba(10,8,24,.96);box-shadow:inset 0 0 0 1px var(--edge),0 8px 30px rgba(0,0,0,.5);
+    padding:12px 20px;border-radius:99px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
+  .toast.show{opacity:1}
+  .hide{display:none !important}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="logo">NATHOLDET</div>
+  <div class="tag">adgangskode</div>
+  <div style="margin-top:22px">
+    <input id="code" type="password" inputmode="text" autocomplete="current-password" placeholder="kode" />
+    <button class="primary" id="unlock">Luk op</button>
+    <div class="err" id="gate-err"></div>
+  </div>
+</div>
+
+<div class="wrap hide" id="app">
+  <header>
+    <div class="logo">NATHOLDET</div>
+    <div class="tag">arbejder mens du sover</div>
+    <a class="back" href="./">← tilbage til hub</a>
+  </header>
+
+  <div class="strip">
+    <div class="meters">
+      <div class="meter">
+        <div class="lbl"><span>5 timer</span><span id="m5v">–</span></div>
+        <div class="bar"><i id="m5" style="width:0"></i></div>
+      </div>
+      <div class="meter">
+        <div class="lbl"><span>denne uge</span><span id="m7v">–</span></div>
+        <div class="bar"><i id="m7" style="width:0"></i></div>
+      </div>
+    </div>
+    <div class="ceiling">Natholdet stopper altid ved 85% — de sidste 15% er dine. Det kan aldrig koste penge ud over abonnementet.</div>
+    <div class="shiftline" id="shiftline">Henter…</div>
+    <div class="row">
+      <button class="primary" id="runnow">Kør nu</button>
+      <button id="refresh">Opdatér</button>
+    </div>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true"  data-tab="forslag">Forslag<span class="badge hide" id="cnt">0</span></button>
+    <button role="tab" aria-selected="false" data-tab="fokus">Fokus</button>
+    <button role="tab" aria-selected="false" data-tab="historik">Historik</button>
+  </div>
+
+  <div id="forslag"></div>
+  <div id="fokus" class="hide"></div>
+  <div id="historik" class="hide"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'https://natholdet-api.mathiasjob.workers.dev';
+const LS = window.localStorage;
+let CODE = LS.getItem('nat_code') || '';
+let STATE = null;
+let TAB = 'forslag';
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let toastTimer;
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+async function api(path, opts){
+  const r = await fetch(API + path, opts || {});
+  if (r.status === 401) throw new Error('401');
+  return r.json();
+}
+const post = (path, body) => api(path, {
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body: JSON.stringify(Object.assign({code:CODE}, body||{}))
+});
+
+// ---------- gate ----------
+async function unlock(code){
+  $('gate-err').textContent = '';
+  try {
+    const d = await api('/state?code=' + encodeURIComponent(code));
+    if (!d.ok) throw new Error('nope');
+    CODE = code; LS.setItem('nat_code', code);
+    STATE = d;
+    $('gate').classList.add('hide'); $('app').classList.remove('hide');
+    render();
+  } catch (e) {
+    $('gate-err').textContent = e.message === '401' ? 'Forkert kode.' : 'Kunne ikke få fat i Natholdet.';
+    LS.removeItem('nat_code');
+  }
+}
+$('unlock').onclick = () => unlock($('code').value.trim());
+$('code').addEventListener('keydown', e => { if (e.key === 'Enter') $('unlock').click(); });
+
+// ---------- data ----------
+async function refresh(){
+  try {
+    const d = await api('/state?code=' + encodeURIComponent(CODE));
+    if (d.ok) { STATE = d; render(); }
+  } catch (e) { toast('Kunne ikke opdatere'); }
+}
+$('refresh').onclick = () => { refresh(); toast('Opdateret'); };
+$('runnow').onclick = async () => {
+  $('runnow').disabled = true;
+  try {
+    const d = await post('/run-now');
+    toast(d.already ? 'Der ligger allerede en vagt i kø' : 'Natholdet går i gang inden for et par minutter');
+  } catch (e) { toast('Kunne ikke sende beskeden'); }
+  setTimeout(() => { $('runnow').disabled = false; }, 4000);
+};
+
+// ---------- render ----------
+const EFFORT = { lille:'lille opgave', mellem:'mellem opgave', stor:'stor opgave' };
+const STATUS = {
+  accepted:{t:'Sagt ja — bygges i nat', c:'ok'},
+  building:{t:'Bygger…', c:'ok'},
+  live:{t:'LIVE', c:'live'},
+  declined:{t:'Sagt nej', c:'bad'},
+  failed:{t:'Gik galt', c:'bad'},
+};
+
+function meters(){
+  const b = STATE.budget || {};
+  const set = (id, val) => {
+    const pct = Math.max(0, Math.min(100, Number(val) || 0));
+    $(id).style.width = pct + '%';
+    $(id).classList.toggle('hot', pct >= 60);
+    $(id + 'v').textContent = (val == null ? '–' : pct.toFixed(0) + '%');
+  };
+  set('m5', b.five_hour); set('m7', b.seven_day);
+
+  const ls = STATE.last_shift;
+  let line;
+  if (!ls) line = 'Ingen vagt kørt endnu.';
+  else if (ls.result === 'skipped') line = 'Sidste vagt sprang over: ' + esc(ls.reason || 'ikke nok budget');
+  else line = 'Sidste vagt: ' + esc(ls.summary || ls.result || '—');
+  if (b.paid_usage_enabled) line = '⚠️ Betalt forbrug er slået til på kontoen — Natholdet nægter at køre.';
+  $('shiftline').innerHTML = line + (STATE.run_pending ? ' <b style="color:var(--gold)">· vagt i kø</b>' : '');
+}
+
+function cardHTML(p, comments){
+  const st = STATUS[p.status];
+  const ev = (p.evidence || []).map(e =>
+    `<div class="ev"><b>${esc(e.type||'')}</b> — ${esc(e.value||'')}${e.note ? '<br>' + esc(e.note) : ''}</div>`).join('');
+  const src = (p.sources || []).map(u => `<div class="ev"><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></div>`).join('');
+  const said = (comments || []).filter(c => c.comment).map(c =>
+    `<div class="said"><b>du skrev</b><br>${esc(c.comment)}</div>`).join('');
+
+  return `<div class="card ${p.lens_type === 'fjern' ? 'fjern' : ''}" data-id="${esc(p.id)}">
+    <div class="chips">
+      <span class="chip proj">${esc(projName(p.project))}</span>
+      <span class="chip ${p.lens_type === 'fjern' ? 'fjern' : 'naer'}">${p.lens_type === 'fjern' ? 'fra et andet fag · ' : ''}${esc(p.lens)}</span>
+      <span class="chip">${esc(EFFORT[p.effort] || p.effort || '')}</span>
+      ${st ? `<span class="chip ${st.c}">${st.t}</span>` : ''}
+    </div>
+    <h3>${esc(p.title)}</h3>
+    <p class="pitch">${esc(p.pitch)}</p>
+    <details>
+      <summary>Mere om hvorfor</summary>
+      <div class="detail">
+        ${p.problem ? `<h4>Problemet</h4>${esc(p.problem)}` : ''}
+        ${p.suggestion ? `<h4>Forslaget</h4>${esc(p.suggestion)}` : ''}
+        ${p.result ? `<h4>Sådan kan du se det virker</h4>${esc(p.result)}` : ''}
+        ${p.lens_story ? `<h4>Hvor idéen kommer fra</h4>${esc(p.lens_story)}` : ''}
+        ${ev ? `<h4>Bevis</h4>${ev}` : ''}
+        ${src ? `<h4>Kilder</h4>${src}` : ''}
+        ${p.agent_note ? `<h4>Natholdets besked</h4>${esc(p.agent_note)}` : ''}
+        ${p.shipped_url ? `<h4>Live</h4><a href="${esc(p.shipped_url)}" target="_blank" rel="noopener">${esc(p.shipped_url)}</a>` : ''}
+      </div>
+    </details>
+    ${said}
+    ${p.status === 'new' ? `<div class="acts">
+      <button class="yes" data-act="accepted">Ja tak</button>
+      <button class="no"  data-act="declined">Nej tak</button>
+      <button data-act="comment">Kommentar</button>
+    </div>
+    <div class="commentbox">
+      <textarea placeholder="Skriv til Natholdet — fx 'ja, men behold lyden' eller 'nej, det bliver for nemt'"></textarea>
+      <div class="acts" style="margin-top:8px"><button class="primary" data-act="send">Send</button></div>
+    </div>` : `<div class="acts"><button data-act="comment">Skriv en kommentar</button></div>
+    <div class="commentbox">
+      <textarea placeholder="Ekstra besked til Natholdet"></textarea>
+      <div class="acts" style="margin-top:8px"><button class="primary" data-act="send">Send</button></div>
+    </div>`}
+  </div>`;
+}
+
+function projName(slug){
+  const p = (STATE.projects || []).find(x => x.slug === slug);
+  return p ? p.name : slug;
+}
+
+function renderForslag(){
+  const list = (STATE.proposals || []).filter(p => p.status === 'new');
+  $('cnt').textContent = list.length;
+  $('cnt').classList.toggle('hide', list.length === 0);
+  $('forslag').innerHTML = list.length
+    ? list.map(p => cardHTML(p, STATE.comments[p.id])).join('')
+    : `<div class="empty">Ingen nye forslag lige nu.<br>Natholdet kigger igen i nat — eller tryk <b>Kør nu</b>.</div>`;
+}
+
+function renderHistorik(){
+  const list = (STATE.proposals || []).filter(p => p.status !== 'new');
+  $('historik').innerHTML = list.length
+    ? list.map(p => cardHTML(p, STATE.comments[p.id])).join('')
+    : `<div class="empty">Endnu ingen afgjorte forslag.</div>`;
+}
+
+const KIND = { game:'Spil', app:'Apps & oplevelser', site:'Sider', teaching:'Undervisning', tool:'Værktøj' };
+function renderFokus(){
+  const byKind = {};
+  (STATE.projects || []).forEach(p => (byKind[p.kind || 'andet'] ||= []).push(p));
+  let html = `<div class="empty" style="padding:6px 4px 14px;text-align:left">
+    Tænd for de projekter Natholdet må arbejde på. Skriv en note, hvis du vil styre hvad den kigger efter.</div>`;
+  Object.keys(byKind).sort().forEach(k => {
+    html += `<div class="grouphead">${esc(KIND[k] || k)}</div>`;
+    byKind[k].forEach(p => {
+      html += `<div class="prow" data-slug="${esc(p.slug)}">
+        <div class="nm"><b>${esc(p.name)}</b><small>${esc(p.slug)}</small></div>
+        <div class="sw ${p.enabled ? 'on' : ''}" data-act="toggle"></div>
+      </div>
+      <div class="noteline"><input data-slug="${esc(p.slug)}" data-act="note"
+        value="${esc(p.note || '')}" placeholder="note til Natholdet (valgfri)" /></div>`;
+    });
+  });
+  $('fokus').innerHTML = html;
+}
+
+function render(){
+  meters();
+  renderForslag(); renderFokus(); renderHistorik();
+  ['forslag','fokus','historik'].forEach(t => $(t).classList.toggle('hide', t !== TAB));
+}
+
+// ---------- interactions ----------
+document.querySelectorAll('.tabs button').forEach(b => {
+  b.onclick = () => {
+    TAB = b.dataset.tab;
+    document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
+    ['forslag','fokus','historik'].forEach(t => $(t).classList.toggle('hide', t !== TAB));
+  };
+});
+
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-act]');
+  if (!btn) return;
+  const act = btn.dataset.act;
+
+  // --- focus toggles
+  if (act === 'toggle'){
+    const row = btn.closest('.prow');
+    const slug = row.dataset.slug;
+    const on = !btn.classList.contains('on');
+    btn.classList.toggle('on', on);
+    try {
+      await post('/toggle', { slug, enabled: on });
+      const p = STATE.projects.find(x => x.slug === slug); if (p) p.enabled = on;
+      toast(on ? 'Natholdet kigger på ' + projName(slug) : 'Natholdet dropper ' + projName(slug));
+    } catch (_) { btn.classList.toggle('on', !on); toast('Kunne ikke gemme'); }
+    return;
+  }
+
+  // --- proposal actions
+  const card = btn.closest('.card');
+  if (!card) return;
+  const id = card.dataset.id;
+
+  if (act === 'comment'){ card.querySelector('.commentbox').classList.toggle('open'); return; }
+
+  if (act === 'send'){
+    const ta = card.querySelector('.commentbox textarea');
+    const comment = ta.value.trim();
+    if (!comment) { toast('Skriv noget først'); return; }
+    btn.disabled = true;
+    try { await post('/verdict', { id, comment }); toast('Sendt til Natholdet'); ta.value = ''; await refresh(); }
+    catch (_) { toast('Kunne ikke sende'); btn.disabled = false; }
+    return;
+  }
+
+  if (act === 'accepted' || act === 'declined'){
+    const comment = card.querySelector('.commentbox textarea')?.value.trim() || '';
+    card.querySelectorAll('button').forEach(b => b.disabled = true);
+    try {
+      await post('/verdict', { id, verdict: act, comment });
+      toast(act === 'accepted' ? 'Ja tak — Natholdet bygger det i nat' : 'Sagt nej — den prøver ikke igen');
+      await refresh();
+    } catch (_) { toast('Kunne ikke sende'); card.querySelectorAll('button').forEach(b => b.disabled = false); }
+  }
+});
+
+// note fields save when you leave them
+document.addEventListener('change', async (e) => {
+  const inp = e.target.closest('input[data-act="note"]');
+  if (!inp) return;
+  try {
+    await post('/toggle', { slug: inp.dataset.slug, note: inp.value });
+    const p = STATE.projects.find(x => x.slug === inp.dataset.slug); if (p) p.note = inp.value;
+    toast('Note gemt');
+  } catch (_) { toast('Kunne ikke gemme noten'); }
+});
+
+// ---------- boot ----------
+if (CODE) unlock(CODE); else $('code').focus();
+</script>
+</body>
+</html>
