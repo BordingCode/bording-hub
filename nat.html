@@ -158,7 +158,7 @@
         <div class="bar"><i id="m7" style="width:0"></i></div>
       </div>
     </div>
-    <div class="ceiling">Natholdet stopper altid ved 85% — de sidste 15% er dine. Det kan aldrig koste penge ud over abonnementet.</div>
+    <div class="ceiling">Natholdet stopper altid ved 85% — de sidste 15% er dine. Om natten holder den ekstra igen, så ugens budget ikke er brugt op mandag. <b>Kør nu</b> springer den bremse over. Det kan aldrig koste penge ud over abonnementet.</div>
     <div class="shiftline" id="shiftline">Henter…</div>
     <div class="row">
       <button class="primary" id="runnow">Kør nu</button>
@@ -265,7 +265,7 @@ function meters(){
   let line;
   if (!ls) line = 'Ingen vagt kørt endnu.';
   else if (ls.result === 'skipped') line = 'Sidste vagt sprang over: ' + esc(ls.reason || 'ikke nok budget');
-  else line = 'Sidste vagt: ' + esc(ls.summary || ls.result || '—');
+  else line = 'Sidste vagt: ' + esc(ls.summary || ls.summary_da || ls.result || '—');
   if (b.paid_usage_enabled) line = '⚠️ Betalt forbrug er slået til på kontoen — Natholdet nægter at køre.';
   $('shiftline').innerHTML = line + (STATE.run_pending ? ' <b style="color:var(--gold)">· vagt i kø</b>' : '');
 }
