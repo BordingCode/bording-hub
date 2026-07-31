@@ -315,7 +315,10 @@
       let html = '';
       if (pc > 0) html += `<button class="ctrl ${showPassive ? 'on' : ''}" id="btn-passive">${showPassive ? 'Skjul passive' : 'Vis passive (' + pc + ')'}</button>`;
       html += `<button class="ctrl ${editing ? 'on' : ''}" id="btn-edit">${editing ? '✓ Færdig' : 'Rediger'}</button>`;
-      html += `<a class="ctrl nat" href="nat.html">🌙 Natholdet${natWaiting > 0 ? `<span class="badge">${natWaiting}</span>` : ''}</a>`;
+      html += `<a class="ctrl nat" href="nat.html">`
+            + `<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">`
+            + `<path d="M20 15.5A8.5 8.5 0 018.5 4a8.5 8.5 0 1011.5 11.5z" fill="currentColor"/></svg>`
+            + `Natholdet${natWaiting > 0 ? `<span class="badge">${natWaiting}</span>` : ''}</a>`;
       controls.innerHTML = html;
       editHint.hidden = !editing;
       document.body.classList.toggle('editing', editing);
