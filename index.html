@@ -211,6 +211,7 @@
       orbit:'<circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="5" transform="rotate(-30 12 12)"/><circle cx="20" cy="8.5" r="1.6" fill="currentColor"/>',
       wave:'<path d="M3 9c1.8-2 3.6-2 5.4 0s3.6 2 5.4 0 3.6-2 5.4 0M3 14c1.8-2 3.6-2 5.4 0s3.6 2 5.4 0 3.6-2 5.4 0"/>',
       book:'<path d="M12 6c-2-1.4-5-1.4-7-.4V18c2-1 5-1 7 .4 2-1.4 5-1.4 7-.4V5.6c-2-1-5-1-7 .4zM12 6v12"/>',
+      trapdoor:'<path d="M3 15h6M15 15h6"/><path d="M9 15l1.5 4.5M15 15l-1.5 4.5"/><rect x="10" y="4" width="4.5" height="8" rx="0.6"/><path d="M13.2 8h.01"/>',
       hex:'<path d="M12 3l7 4.5v9L12 21l-7-4.5v-9z"/><path d="M9 10.5l3 3 3-3M9 14l3 3 3-3"/>',
       tag:'<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.4" fill="currentColor"/>',
       paw:'<ellipse cx="12" cy="15.5" rx="4.6" ry="3.8"/><circle cx="5.8" cy="10.5" r="1.9"/><circle cx="9.6" cy="7.2" r="1.9"/><circle cx="14.4" cy="7.2" r="1.9"/><circle cx="18.2" cy="10.5" r="1.9"/>'
@@ -220,6 +221,7 @@
     // Each section has ONE accent colour. Edit lists to add/remove projects.
     const SECTIONS = [
       { title: 'Spil', accent: '#34f5ff', items: [
+        { name: 'Trapdoor', icon: 'trapdoor', desc: 'Kort platformer hvor banen snyder. Hver bane ser harmløs ud — et fladt gulv, en dør, tre sekunders gang. Så forsvinder gulvet under dig, pigge skyder op, eller døren går sin vej. 24 håndlavede baner i tre kapitler, øjeblikkelig genstart og en dødstæller der dømmer dig.', url: 'https://bordingcode.github.io/trapdoor/' },
         { name: 'OFF-LEASH', icon: 'paw', desc: 'Neon-nat brawler-roguelike set fra MONSTERETS side: du er et bortløbet \'aktiv\' på flugt fra VOGTEREN gennem regnvåde gader (landscape — drej telefonen!). Smash-agtige kampe: kæder, launchere, luft-juggles og perfekte dodges i slowmotion, med hints der lærer dig knapperne mens du spiller. 43 Pokémon-inspirerede evner, 20 former (udvikl i fire retninger via essenser), 3 akter med jæger-trænere + kaptajn-bossen VOGTEREN i tre faser. Frie monstre bliver nye startere, historien skrider frem når du dør OG vinder, og efter din første flugt venter Pursuit-stigen (8 ekstra-regler). Fuldt spilbart.', url: 'https://bordingcode.github.io/offleash/' },
         { name: 'Cute Fight', icon: 'paw', desc: 'Monster-brawler i åben verden med hjemmelavet pixel-art — udforsk landsby, eng, skov og frostbjerge, hvor vilde monstre græsser i flokke og kampene sker lige dér, seamless. Gør dem fortumlede og fang dem med en perfekt timet kugle (men slå ikke for hårdt!). Byg et hold på fire, løs Vogterens quests, åbn vogter-portene og mød det legendariske uhyre på Toppen — besejr eller BEFRI det. Fang og udvikl alle 9 arter for Aurora-charmen!', url: 'https://bordingcode.github.io/cutefight/' },
         { name: 'Hexfall', icon: 'hex', desc: 'Troldmands-taktik — du angriber aldrig selv; du skubber og trækker fjender ud i fælderne. Vælg en disciplin der ændrer dine trylleformularer, udløs kædereaktioner (olie, tønder, is) og styrt ned gennem tårnet. Nye runs låser nyt indhold op — aldrig rå styrke.', url: 'https://bordingcode.github.io/hexfall/' },
@@ -363,6 +365,7 @@
     // app-key -> visningsnavn (matcher hub'ens projekter)
     var NAMES = {
       'bording-hub': 'Bording Hub (selv)',
+      'trapdoor': 'Trapdoor',
       'hojvande': 'Højvande', 'sort-sol': 'Sort Sol', 'primordia': 'Primordia',
       'astra': 'ASTRA', 'emberlock': 'Emberlock', 'warbound': 'Warbound',
       'saltforge': 'Saltforge', 'saltforge3d': 'Saltforge 3D', 'starweaver': 'Starweaver',
