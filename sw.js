@@ -1,6 +1,6 @@
 /* Bording Hub service worker — installable PWA + offline shell.
    Bump CACHE on every deploy so browsers fetch fresh files. */
-const CACHE = 'bording-hub-v6';
+const CACHE = 'bording-hub-v7';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -12,6 +12,7 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
+  if (new URL(req.url).origin !== location.origin) return; // don't cache/fallback external APIs (e.g. hub-stats)
   // Network-first so the project list stays fresh; fall back to cache (then the shell) when offline.
   e.respondWith(
     fetch(req).then((res) => {
