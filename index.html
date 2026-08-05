@@ -85,6 +85,17 @@
       color: #1a1206; font-size: 11px; font-weight: 800; line-height: 17px; text-align: center; }
     .edit-hint { text-align: center; color: var(--muted); font-size: 12.5px; line-height: 1.5; margin: -14px 0 20px; }
     .edit-hint b { color: var(--cyan); font-weight: 700; }
+    /* Redigeringstilstand kan være flere skærmhøjde lang (31 projekter) — uden denne
+       skal man scrolle helt til toppen for at afslutte. Fast knap i tommelfingerzonen. */
+    .edit-fab {
+      position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 18px);
+      transform: translateX(-50%); z-index: 20;
+      font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: .05em;
+      color: #05030f; background: var(--cyan); border: none; border-radius: 999px;
+      padding: 13px 28px; cursor: pointer;
+      box-shadow: 0 10px 26px -6px rgba(52,245,255,.55), inset 0 0 0 1px rgba(255,255,255,.3);
+    }
+    .edit-fab[hidden] { display: none; }
     .statusbtn { margin-left: auto; flex: 0 0 auto; font-family: 'Rajdhani', sans-serif; font-weight: 700;
       font-size: 12px; letter-spacing: .08em; text-transform: uppercase; border-radius: 999px;
       padding: 8px 14px; border: 1px solid var(--edge); background: rgba(255,255,255,.05); color: var(--muted); cursor: pointer; }
@@ -151,6 +162,7 @@
           <div class="edit-hint" id="edit-hint" hidden>Tryk <b>Aktiv / Passiv</b> på hvert projekt for at vælge, hvad der vises på forsiden.</div>
           <div id="sections"></div>
           <footer>Lavet af Bording &middot; <span id="count"></span> projekter &middot; <button type="button" class="linkbtn" id="to-stats">stats ›</button> &middot; <a class="linkbtn" href="nat.html" style="text-decoration:none">natholdet ›</a></footer>
+          <button type="button" class="edit-fab" id="edit-fab" hidden>✓ Færdig</button>
         </div>
       </section>
 
@@ -272,6 +284,7 @@
     const root = document.getElementById('sections');
     const controls = document.getElementById('controls');
     const editHint = document.getElementById('edit-hint');
+    const editFab = document.getElementById('edit-fab');
 
     function render() {
       root.innerHTML = '';
@@ -326,10 +339,12 @@
             + `Natholdet${natWaiting > 0 ? `<span class="badge">${natWaiting}</span>` : ''}</a>`;
       controls.innerHTML = html;
       editHint.hidden = !editing;
+      editFab.hidden = !editing;
       document.body.classList.toggle('editing', editing);
       const bp = document.getElementById('btn-passive');
       if (bp) bp.onclick = () => { showPassive = !showPassive; LS.setItem('bh_showpassive', showPassive ? '1' : '0'); render(); };
       document.getElementById('btn-edit').onclick = () => { editing = !editing; render(); };
+      editFab.onclick = () => { editing = false; render(); };
     }
 
     // toggle a project's status / block navigation while editing
