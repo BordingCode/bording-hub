@@ -92,6 +92,9 @@
     .card.passive { opacity: .5; }
     body.editing .card { cursor: default; }
     body.editing .card.passive { opacity: .62; }
+    /* Beskæring kræver overblik, ikke løv: skjul beskrivelsen i redigeringstilstand,
+       så listen kan overskues på få sekunder i stedet for at scrolle forbi lange tekster. */
+    body.editing .card .desc { display: none; }
 
     /* ---- sliding views: hub <-> stats ---- */
     .slider { overflow: hidden; transition: height .42s cubic-bezier(.4,0,.2,1); }
