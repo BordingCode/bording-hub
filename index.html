@@ -531,6 +531,20 @@
     try { regionDN = new Intl.DisplayNames(['da'], { type: 'region' }); langDN = new Intl.DisplayNames(['da'], { type: 'language' }); } catch (e) {}
     function country(c) { if (!c) return ''; if (c === 'T1') return 'Tor-netværk'; if (c === 'XX') return 'Ukendt land'; try { return regionDN ? regionDN.of(c) : c; } catch (e) { return c; } }
     function language(l) { if (!l) return ''; try { return langDN ? langDN.of(l) : l; } catch (e) { return l; } }
+    // referrer host -> friendly source name
+    function source(r) {
+      if (!r) return '';
+      if (r === 'direct') return 'Direkte';
+      var m = r.match(/^bordingcode\.github\.io\/(.*)$/);
+      if (m) return m[1] === 'bording-hub' ? 'Bording Hub' : m[1] ? (NAMES[m[1]] || m[1]) + ' (anden app)' : 'bordingcode.github.io';
+      var R = [[/^com\.google\.android\.googlequicksearchbox$/, 'Google-appen'], [/com\.google\.android\.gm|mail\.google/, 'Gmail'], [/(^|\.)google\./, 'Google'], [/facebook|^fb\.|\.fb\./, 'Facebook'], [/instagram/, 'Instagram'], [/messenger/, 'Messenger'],
+        [/(^|\.)bing\./, 'Bing'], [/duckduckgo/, 'DuckDuckGo'], [/^t\.co$|twitter|(^|\.)x\.com$/, 'X / Twitter'], [/reddit/, 'Reddit'],
+        [/linkedin|lnkd/, 'LinkedIn'], [/youtube|youtu\.be/, 'YouTube'], [/com\.google\.android\.gm|mail\.google/, 'Gmail'],
+        [/outlook|live\.com|hotmail/, 'Outlook'], [/chatgpt|openai/, 'ChatGPT'], [/claude\.ai/, 'Claude'], [/github\.com/, 'GitHub'],
+        [/ecosia/, 'Ecosia'], [/yahoo/, 'Yahoo'], [/^com\.google\.android\.googlequicksearchbox$/, 'Google-appen']];
+      for (var i = 0; i < R.length; i++) if (R[i][0].test(r)) return R[i][1];
+      return r;
+    }
     var DTYPE = { phone: 'Telefon', tablet: 'Tablet', desktop: 'Computer', bot: 'Robot / test' };
     var DICON = { phone: '📱', tablet: '📱', desktop: '💻', bot: '🤖' };
     var myId = ''; try { myId = (localStorage.getItem('hubdev') || '').slice(0, 8); } catch (e) {}
@@ -591,6 +605,15 @@
           '<span class="n"><b>' + nf.format(r.devices) + '</b> enh. · ' + nf.format(r.visits) + ' besøg</span>' +
           '<span class="track2"><i style="width:' + Math.max(3, Math.round(r.devices / max * 100)) + '%"></i></span></div>';
       }).join('');
+    }
+    function mergeRef(rows) {
+      var by = {}, out = [];
+      rows.forEach(function (r) {
+        var k = source(r.k);
+        if (!by[k]) { by[k] = { k: k, visits: 0, devices: 0 }; out.push(by[k]); }
+        by[k].visits += r.visits; by[k].devices += r.devices; // devices may double-count across hosts; fine for a rough view
+      });
+      return out.sort(function (a, b) { return b.devices - a.devices || b.visits - a.visits; });
     }
     function card(title, sub, inner) {
       return '<div class="card2"><h3>' + title + (sub ? '<small>' + sub + '</small>' : '') + '</h3>' + inner + '</div>';
@@ -657,6 +680,9 @@
         card('Browser', '', hbars(B.browser, function (k) { return k; })) +
         card('Sprog', '', hbars(B.lang, function (k) { return language(k) || k; })) +
         '</div>';
+      h += card('Kom fra', 'hvor de klikkede ind fra', (B.ref && B.ref.length ? hbars(mergeRef(B.ref), function (k) { return k; }) :
+        '<div class="empty">' + (t.withRef ? 'Kun klik inde fra appen selv i perioden.' : 'Måles fra 11. nov 2026 — dukker op efterhånden som apps opdateres hos brugerne.') + '</div>') +
+        '<p class="note" style="margin:10px 0 0">«Direkte» = ingen afsender: bogmærke, app-ikon på hjemmeskærmen, skrevet adressen, eller et link fra SMS/Messenger/mail-apps (de fortæller ikke, hvor man kom fra).</p>');
 
       // --- loyalty (all time) ---
       var L = {}; (d.loyalty || []).forEach(function (r) { L[r.k] = r.n; });
@@ -678,7 +704,7 @@
         var l2 = v.dtype ? [where, language(v.lang)].filter(Boolean).join(' · ') : 'ingen detaljer (besøgt før 11. nov)';
         return '<div class="vis"><div class="ic">' + (DICON[v.dtype] || '❔') + '</div><div class="main"><div class="l1">' + esc(l1) +
           (isMe ? '<span class="pill me">Dig</span>' : '') + (isNew ? '<span class="pill">Ny</span>' : '') + (v.dtype === 'bot' ? '<span class="pill bot">Robot</span>' : '') +
-          '</div><div class="l2">' + esc(l2) + '</div><div class="l2">Først set ' + esc(dateOnly(v.first)) + ' · ' + nf.format(v.hits || v.visits) + ' besøg i alt</div></div>' +
+          '</div><div class="l2">' + esc(l2) + '</div>' + (v.ref ? '<div class="l2">Kom fra: ' + esc(source(v.ref)) + '</div>' : '') + '<div class="l2">Først set ' + esc(dateOnly(v.first)) + ' · ' + nf.format(v.hits || v.visits) + ' besøg i alt</div></div>' +
           '<div class="r"><b>' + nf.format(v.visits) + '</b>i perioden<br>' + esc(rel(v.last)) + '</div></div>';
       }).join('') : '<div class="empty">Ingen besøgende i perioden.</div>';
       h += card('Besøgende', vs.length >= 60 ? 'de 60 seneste' : 'nyeste først', vh);
@@ -753,6 +779,6 @@
   })();
   </script>
   <!-- hub-stats visit counter -->
-  <script>(function(){try{var A="bording-hub",K="hubdev",d=localStorage.getItem(K);if(!d){d=(self.crypto&&crypto.randomUUID?crypto.randomUUID():Date.now()+"."+Math.random().toString(36).slice(2));localStorage.setItem(K,d);}var u="https://hub-stats.mathiasjob.workers.dev/hit",b=JSON.stringify({app:A,d:d});if(navigator.sendBeacon){navigator.sendBeacon(u,b);}else{fetch(u,{method:"POST",body:b,keepalive:true,mode:"no-cors"});}}catch(e){}})();</script>
+  <script>(function(){try{var A="bording-hub",K="hubdev",d=localStorage.getItem(K);if(!d){d=(self.crypto&&crypto.randomUUID?crypto.randomUUID():Date.now()+"."+Math.random().toString(36).slice(2));localStorage.setItem(K,d);}var u="https://hub-stats.mathiasjob.workers.dev/hit",R=(function(){try{var x=document.referrer;if(!x)return"";x=new URL(x);var h=location.host;if(x.host!==h)return x.host;if(/\.github\.io$/.test(h)){var s=x.pathname.split("/")[1]||"",m=location.pathname.split("/")[1]||"";return s===m?"self":h+"/"+s;}return"self";}catch(e){return""}})(),b=JSON.stringify({app:A,d:d,r:R});if(navigator.sendBeacon){navigator.sendBeacon(u,b);}else{fetch(u,{method:"POST",body:b,keepalive:true,mode:"no-cors"});}}catch(e){}})();</script>
 </body>
 </html>
