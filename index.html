@@ -120,6 +120,7 @@
     .back { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 18px; background: none; border: 0;
       color: var(--cyan); font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 14px; letter-spacing: .04em; cursor: pointer; padding: 6px 2px; }
     .back:hover { text-decoration: underline; }
+    .back[hidden] { display: none; }
 
     /* stats view */
     .totals { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
@@ -145,6 +146,50 @@
       padding: 8px 16px; cursor: pointer; transition: .15s; }
     .seg button:hover { color: var(--ink); border-color: var(--cyan); }
     .seg button.on { color: #05030f; background: var(--cyan); border-color: var(--cyan); }
+
+    /* clickable app rows -> detail */
+    .tablebox tbody tr.go { cursor: pointer; transition: background .15s; }
+    .tablebox tbody tr.go:hover, .tablebox tbody tr.go:focus-visible { background: rgba(52,245,255,.07); outline: none; }
+    .tablebox td.chev { width: 22px; padding-left: 0; color: var(--muted); font-weight: 700; }
+    .tablebox tbody tr.go:hover td.chev { color: var(--cyan); }
+
+    /* app detail */
+    .dt-title { font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: clamp(24px, 7vw, 36px); text-align: center;
+      margin: 0 0 6px; color: var(--ink); text-shadow: 0 0 22px rgba(52,245,255,.35); overflow-wrap: anywhere; }
+    .dt-sub { text-align: center; color: var(--muted); font-size: 13.5px; margin-bottom: 18px; }
+    .totals.four .num { font-size: clamp(22px, 7vw, 34px); }
+    .card2 { background: var(--panel); box-shadow: inset 0 0 0 1px var(--edge); border-radius: 18px; padding: 16px; margin-bottom: 14px; }
+    .card2 h3 { font-family: 'Orbitron', sans-serif; font-weight: 600; font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--cyan); margin: 0 0 12px; }
+    .card2 h3 small { font-family: 'Rajdhani', sans-serif; letter-spacing: .02em; text-transform: none; color: var(--muted); font-size: 12.5px; font-weight: 500; margin-left: 6px; }
+    .bars { display: flex; align-items: flex-end; gap: 3px; height: 110px; }
+    .bars .b { flex: 1 1 0; min-width: 0; background: linear-gradient(to top, var(--violet), var(--cyan)); border-radius: 3px 3px 0 0; min-height: 2px; position: relative; }
+    .bars .b.zero { background: var(--edge); }
+    .bars .b:hover::after { content: attr(data-t); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 4px;
+      white-space: nowrap; background: #11102a; color: var(--ink); border: 1px solid var(--edge); border-radius: 6px; padding: 3px 7px; font-size: 12px; z-index: 2; }
+    .axis { display: flex; justify-content: space-between; color: var(--muted); font-size: 11.5px; margin-top: 6px; }
+    .grid2 { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 14px; }
+    .grid2 .card2 { margin-bottom: 0; }
+    @media (max-width: 560px) { .grid2 { grid-template-columns: minmax(0,1fr); } }
+    .hb { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; margin-bottom: 9px; font-size: 14px; }
+    .hb .k { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+    .hb .n { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+    .hb .n b { color: var(--violet); font-family: 'Orbitron', sans-serif; font-weight: 600; font-size: 12px; }
+    .hb .track2 { grid-column: 1 / -1; height: 5px; border-radius: 3px; background: var(--edge); overflow: hidden; }
+    .hb .track2 i { display: block; height: 100%; background: linear-gradient(90deg, var(--violet), var(--cyan)); border-radius: 3px; }
+    .empty { color: var(--muted); font-size: 13px; }
+    .vis { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--edge); }
+    .vis:first-of-type { border-top: 0; padding-top: 0; }
+    .vis .ic { font-size: 22px; line-height: 1; width: 28px; text-align: center; flex: none; padding-top: 2px; }
+    .vis .main { flex: 1 1 auto; min-width: 0; }
+    .vis .l1 { font-weight: 700; font-size: 15px; }
+    .vis .l2 { color: var(--muted); font-size: 13px; margin-top: 2px; }
+    .vis .r { text-align: right; flex: none; font-size: 12.5px; color: var(--muted); }
+    .vis .r b { display: block; color: var(--ink); font-family: 'Orbitron', sans-serif; font-weight: 600; font-size: 14px; }
+    .pill { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; border-radius: 999px;
+      padding: 1px 7px; margin-left: 6px; vertical-align: 2px; color: #05030f; background: var(--green); }
+    .pill.me { background: var(--gold); }
+    .pill.bot { background: var(--magenta); }
   </style>
 </head>
 <body>
@@ -170,6 +215,7 @@
       <section class="view view-stats" id="view-stats">
         <div class="wrap">
           <button type="button" class="back" id="to-hub">‹ Tilbage til hub</button>
+          <div id="stats-list">
           <header>
             <div class="logo" style="font-size:clamp(26px,7vw,40px)">STATISTIK</div>
             <div class="tag">besøg &amp; enheder &middot; siden måling startede</div>
@@ -192,6 +238,18 @@
             unikke mennesker. Brug knapperne foroven til at skifte mellem seneste 24 timer,
             7 dage og i alt. Målingen startede, da tælleren blev sat op.
           </p>
+          </div>
+          <div id="stats-detail" hidden>
+            <button type="button" class="back" id="dt-back">‹ Alle apps</button>
+            <h2 class="dt-title" id="dt-title"></h2>
+            <div class="dt-sub" id="dt-sub"></div>
+            <div class="seg" id="dt-seg">
+              <button type="button" data-d="1">Seneste 24t</button>
+              <button type="button" data-d="7" class="on">7 dage</button>
+              <button type="button" data-d="30">30 dage</button>
+            </div>
+            <div id="dt-body"><div class="state">Henter detaljer …</div></div>
+          </div>
           <footer id="updated"></footer>
         </div>
       </section>
@@ -394,7 +452,9 @@
       'yatzy': 'Yatzy', 'braingames': 'Hjernespil', 'dinder': 'Dinder',
       'babynames': 'Babynavne', 'grenadilla': 'Grenadilla', 'tegnspire': 'Tegnspire', 'emma-strik': 'Emmas Strik',
       'podwalk': 'Podwalk', 'hylden': 'Hylden', 'grimoire': 'Grimoire',
-      'crimpedia': 'Crimpedia', 'baby-sleep': 'Baby Sleep', 'secret-santa': 'Secret Santa'
+      'crimpedia': 'Crimpedia', 'baby-sleep': 'Baby Sleep', 'secret-santa': 'Secret Santa',
+      'lull': 'Lull', 'holo': 'HOLO', 'brugtergodt': 'Brugt er godt', 'offleash': 'OFF-LEASH', '13-0': '13-0',
+      'cutefight': 'Cute Fight', 'hexfall': 'Hexfall'
     };
 
     function setHeight() {
@@ -425,11 +485,12 @@
       } else {
         var rows = w.apps.map(function (a, i) {
           var name = NAMES[a.app] || a.app;
-          return '<tr><td class="name"><span class="rank">' + (i + 1) + '</span>' + name + '</td>' +
+          return '<tr class="go" tabindex="0" role="button" data-app="' + esc(a.app) + '" title="Se detaljer for ' + esc(name) + '">' +
+                 '<td class="name"><span class="rank">' + (i + 1) + '</span>' + esc(name) + '</td>' +
                  '<td class="v">' + nf.format(a.visits) + '</td>' +
-                 '<td class="d">' + nf.format(a.devices) + '</td></tr>';
+                 '<td class="d">' + nf.format(a.devices) + '</td><td class="chev">›</td></tr>';
         }).join('');
-        box.innerHTML = '<table><thead><tr><th>App</th><th>Besøg</th><th>Enheder</th></tr></thead><tbody>' + rows + '</tbody></table>';
+        box.innerHTML = '<table><thead><tr><th>App</th><th>Besøg</th><th>Enheder</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
       }
       var now = new Date();
       document.getElementById('updated').textContent =
@@ -459,6 +520,191 @@
       paintStats();
     });
 
+
+    // ===== per-app detail =====
+    var APP_API = 'https://hub-stats.mathiasjob.workers.dev/app';
+    var detailApp = null, detailDays = 7, detailReq = 0;
+    var listEl = document.getElementById('stats-list');
+    var detEl = document.getElementById('stats-detail');
+    function esc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+    var regionDN = null, langDN = null;
+    try { regionDN = new Intl.DisplayNames(['da'], { type: 'region' }); langDN = new Intl.DisplayNames(['da'], { type: 'language' }); } catch (e) {}
+    function country(c) { if (!c) return ''; if (c === 'T1') return 'Tor-netværk'; if (c === 'XX') return 'Ukendt land'; try { return regionDN ? regionDN.of(c) : c; } catch (e) { return c; } }
+    function language(l) { if (!l) return ''; try { return langDN ? langDN.of(l) : l; } catch (e) { return l; } }
+    var DTYPE = { phone: 'Telefon', tablet: 'Tablet', desktop: 'Computer', bot: 'Robot / test' };
+    var DICON = { phone: '📱', tablet: '📱', desktop: '💻', bot: '🤖' };
+    var myId = ''; try { myId = (localStorage.getItem('hubdev') || '').slice(0, 8); } catch (e) {}
+
+    function rel(ts) {
+      if (!ts) return '–';
+      var d = new Date(ts), now = new Date();
+      var day = function (x) { return new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime(); };
+      var diff = Math.round((day(now) - day(d)) / 86400000);
+      var hm = d.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+      if (diff === 0) return 'i dag ' + hm;
+      if (diff === 1) return 'i går ' + hm;
+      if (diff < 7) return d.toLocaleDateString('da-DK', { weekday: 'long' }) + ' ' + hm;
+      return d.toLocaleDateString('da-DK', { day: 'numeric', month: 'short', year: d.getFullYear() === now.getFullYear() ? undefined : 'numeric' });
+    }
+    function dateOnly(ts) { return ts ? new Date(ts).toLocaleDateString('da-DK', { day: 'numeric', month: 'short', year: 'numeric' }) : '–'; }
+
+    function openDetail(app, fromHash) {
+      if (!app) return;
+      if (!fromHash) detailDays = curWin === 'd1' ? 1 : curWin === 'd7' ? 7 : 30;
+      detailApp = app;
+      listEl.hidden = true; detEl.hidden = false; document.getElementById('to-hub').hidden = true;
+      document.getElementById('dt-title').textContent = NAMES[app] || app;
+      document.getElementById('dt-sub').textContent = '';
+      Array.prototype.forEach.call(document.querySelectorAll('#dt-seg button'), function (b) {
+        b.classList.toggle('on', Number(b.getAttribute('data-d')) === detailDays);
+      });
+      if (!fromHash) syncHash(true);
+      loadDetail();
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+    }
+    function closeDetail(silent) {
+      if (!detailApp) return;
+      detailApp = null; detailReq++;
+      listEl.hidden = false; detEl.hidden = true; document.getElementById('to-hub').hidden = false;
+      if (!silent) syncHash(true);
+      if (onStats) setHeight();
+    }
+    function loadDetail() {
+      var my = ++detailReq, body = document.getElementById('dt-body');
+      body.innerHTML = '<div class="state">Henter detaljer …</div>';
+      setHeight();
+      var u = APP_API + '?app=' + encodeURIComponent(detailApp) + '&days=' + detailDays + '&off=' + new Date().getTimezoneOffset();
+      fetch(u, { cache: 'no-store' })
+        .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+        .then(function (d) { if (my === detailReq) paintDetail(d); })
+        .catch(function () {
+          if (my !== detailReq) return;
+          body.innerHTML = '<div class="state">Kunne ikke hente detaljer lige nu.</div>'; setHeight();
+        });
+    }
+
+    function hbars(rows, label, total) {
+      if (!rows || !rows.length) return '<div class="empty">Ingen data endnu.</div>';
+      var max = Math.max.apply(null, rows.map(function (r) { return r.devices; })) || 1;
+      return rows.map(function (r) {
+        return '<div class="hb"><span class="k">' + esc(label(r.k)) + '</span>' +
+          '<span class="n"><b>' + nf.format(r.devices) + '</b> enh. · ' + nf.format(r.visits) + ' besøg</span>' +
+          '<span class="track2"><i style="width:' + Math.max(3, Math.round(r.devices / max * 100)) + '%"></i></span></div>';
+      }).join('');
+    }
+    function card(title, sub, inner) {
+      return '<div class="card2"><h3>' + title + (sub ? '<small>' + sub + '</small>' : '') + '</h3>' + inner + '</div>';
+    }
+
+    function paintDetail(d) {
+      var body = document.getElementById('dt-body');
+      var t = d.totals, at = d.allTime || {};
+      document.getElementById('dt-sub').textContent =
+        'I alt siden start: ' + nf.format(at.visits || 0) + ' besøg fra ' + nf.format(at.devices || 0) + ' enheder' +
+        (at.first ? ' · målt siden ' + dateOnly(at.first) : '');
+
+      var h = '';
+      h += '<div class="totals four" style="grid-template-columns:repeat(2,minmax(0,1fr))">' +
+        '<div class="tot" style="--c:var(--cyan)"><div class="num">' + nf.format(t.visits) + '</div><div class="lbl">Besøg</div></div>' +
+        '<div class="tot" style="--c:var(--violet)"><div class="num">' + nf.format(t.devices) + '</div><div class="lbl">Enheder</div></div>' +
+        '<div class="tot" style="--c:var(--green)"><div class="num">' + nf.format(t.newDevices) + '</div><div class="lbl">Nye enheder</div></div>' +
+        '<div class="tot" style="--c:var(--gold)"><div class="num">' + (t.devices ? (t.visits / t.devices).toLocaleString('da-DK', { maximumFractionDigits: 1 }) : '–') + '</div><div class="lbl">Besøg pr. enhed</div></div>' +
+        '</div>';
+
+      // --- over time (fill empty buckets) ---
+      var hourB = d.bucket === 'hour', size = hourB ? 3600000 : 86400000;
+      var startB = Math.floor((d.since + d.offMs) / size), endB = Math.floor((d.now + d.offMs) / size);
+      var map = {}; (d.series || []).forEach(function (r) { map[r.b] = r; });
+      var buckets = []; for (var b = startB; b <= endB; b++) buckets.push(map[b] || { b: b, visits: 0, devices: 0 });
+      var maxV = Math.max.apply(null, buckets.map(function (x) { return x.visits; })) || 1;
+      var lbl = function (b) {
+        var dt = new Date(b * size - d.offMs);
+        return hourB ? dt.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' })
+                     : dt.toLocaleDateString('da-DK', { weekday: 'short', day: 'numeric', month: 'short' });
+      };
+      var bars = buckets.map(function (x) {
+        return '<div class="b' + (x.visits ? '' : ' zero') + '" style="height:' + (x.visits ? Math.max(4, x.visits / maxV * 100) : 2) + '%" data-t="' +
+          esc(lbl(x.b)) + ': ' + x.visits + ' besøg · ' + x.devices + ' enh."></div>';
+      }).join('');
+      h += card('Besøg over tid', hourB ? 'pr. time' : 'pr. dag',
+        '<div class="bars">' + bars + '</div><div class="axis"><span>' + esc(lbl(startB)) + '</span><span>' + esc(lbl(endB)) + '</span></div>');
+
+      // --- hour of day ---
+      var hrs = []; for (var i = 0; i < 24; i++) hrs.push(0);
+      (d.hours || []).forEach(function (r) { hrs[r.h] = r.visits; });
+      var maxH = Math.max.apply(null, hrs) || 1;
+      h += card('Hvornår på døgnet', 'dansk tid',
+        '<div class="bars" style="height:80px">' + hrs.map(function (v, i) {
+          return '<div class="b' + (v ? '' : ' zero') + '" style="height:' + (v ? Math.max(5, v / maxH * 100) : 2) + '%" data-t="kl. ' + i + '–' + (i + 1) + ': ' + v + ' besøg"></div>';
+        }).join('') + '</div><div class="axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>');
+
+      // --- who: breakdowns ---
+      var B = d.breakdown || {};
+      if (t.visits && t.detailed < t.visits) {
+        h += '<p class="note" style="margin:0 4px 14px">Sted, enhed og browser måles fra 11. nov 2026. ' +
+          nf.format(t.visits - t.detailed) + ' af ' + nf.format(t.visits) + ' besøg i perioden er fra før og tæller kun med i tallene ovenfor.</p>';
+      }
+      if (!t.detailed) {
+        h += card('Hvem er de?', '', '<div class="empty">' + (t.visits
+          ? 'Land, by, enhed, browser og sprog bliver målt fra 11. nov 2026 — de dukker op her ved næste besøg.'
+          : 'Ingen besøg i perioden.') + '</div>');
+      } else
+      h += '<div class="grid2" style="margin-bottom:14px">' +
+        card('Land', '', hbars(B.country, country)) +
+        card('By', 'cirka', hbars(B.city, function (k) { return k; })) +
+        card('Enhed', '', hbars(B.dtype, function (k) { return (DICON[k] || '') + ' ' + (DTYPE[k] || k); })) +
+        card('Styresystem', '', hbars(B.os, function (k) { return k; })) +
+        card('Browser', '', hbars(B.browser, function (k) { return k; })) +
+        card('Sprog', '', hbars(B.lang, function (k) { return language(k) || k; })) +
+        '</div>';
+
+      // --- loyalty (all time) ---
+      var L = {}; (d.loyalty || []).forEach(function (r) { L[r.k] = r.n; });
+      var LK = [['1', 'Kom én gang'], ['2-5', '2–5 besøg'], ['6-20', '6–20 besøg'], ['21+', 'Over 20 besøg (stamgæster)']];
+      var maxL = Math.max.apply(null, LK.map(function (k) { return L[k[0]] || 0; })) || 1;
+      h += card('Kommer de igen?', 'alle enheder siden start', LK.map(function (k) {
+        var n = L[k[0]] || 0;
+        return '<div class="hb"><span class="k">' + k[1] + '</span><span class="n"><b>' + nf.format(n) + '</b> enheder</span>' +
+          '<span class="track2"><i style="width:' + (n ? Math.max(3, Math.round(n / maxL * 100)) : 0) + '%"></i></span></div>';
+      }).join(''));
+
+      // --- individual visitors ---
+      var vs = d.visitors || [];
+      var vh = vs.length ? vs.map(function (v) {
+        var isNew = v.first && v.first >= d.since, isMe = myId && v.id === myId;
+        var l1 = v.dtype ? (DTYPE[v.dtype] || v.dtype) + (v.os && v.os !== 'Andet' ? ' · ' + v.os : '') + (v.browser && v.browser !== 'Andet' ? ' · ' + v.browser : '')
+                         : 'Enhed #' + v.id.slice(0, 4);
+        var where = [v.city, country(v.country)].filter(Boolean).join(', ');
+        var l2 = v.dtype ? [where, language(v.lang)].filter(Boolean).join(' · ') : 'ingen detaljer (besøgt før 11. nov)';
+        return '<div class="vis"><div class="ic">' + (DICON[v.dtype] || '❔') + '</div><div class="main"><div class="l1">' + esc(l1) +
+          (isMe ? '<span class="pill me">Dig</span>' : '') + (isNew ? '<span class="pill">Ny</span>' : '') + (v.dtype === 'bot' ? '<span class="pill bot">Robot</span>' : '') +
+          '</div><div class="l2">' + esc(l2) + '</div><div class="l2">Først set ' + esc(dateOnly(v.first)) + ' · ' + nf.format(v.hits || v.visits) + ' besøg i alt</div></div>' +
+          '<div class="r"><b>' + nf.format(v.visits) + '</b>i perioden<br>' + esc(rel(v.last)) + '</div></div>';
+      }).join('') : '<div class="empty">Ingen besøgende i perioden.</div>';
+      h += card('Besøgende', vs.length >= 60 ? 'de 60 seneste' : 'nyeste først', vh);
+      h += '<p class="note">Hver række er én browser/telefon (tilfældigt id — ingen navne, ingen IP-adresser). By og land er Cloudflares ' +
+        'gæt ud fra netværket, så de kan være lidt skæve (fx nærmeste større by). «Dig» = den enhed du sidder på nu. ' +
+        '«Robot» = automatiske tests og crawlere.</p>';
+
+      body.innerHTML = h;
+      setHeight();
+    }
+
+    document.getElementById('stats-box').addEventListener('click', function (e) {
+      var tr = e.target.closest('tr[data-app]'); if (tr) openDetail(tr.getAttribute('data-app'));
+    });
+    document.getElementById('stats-box').addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var tr = e.target.closest('tr[data-app]'); if (tr) { e.preventDefault(); openDetail(tr.getAttribute('data-app')); }
+    });
+    document.getElementById('dt-back').addEventListener('click', function () { closeDetail(false); try { window.scrollTo(0, 0); } catch (e) {} });
+    document.getElementById('dt-seg').addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-d]'); if (!btn) return;
+      detailDays = Number(btn.getAttribute('data-d'));
+      Array.prototype.forEach.call(this.querySelectorAll('button'), function (b) { b.classList.toggle('on', b === btn); });
+      loadDetail();
+    });
+
     function go(stats) {
       if (stats === onStats) { setHeight(); return; }
       onStats = stats;
@@ -469,15 +715,23 @@
     }
     // keep the URL in sync without relying on quirky hash-clearing or the history stack
     function syncHash(stats) {
-      try { history.replaceState(null, '', stats ? '#stats' : (location.pathname + location.search)); } catch (e) {}
+      var h = stats ? ('#stats' + (detailApp ? '/' + encodeURIComponent(detailApp) : '')) : (location.pathname + location.search);
+      try { history.replaceState(null, '', h); } catch (e) {}
     }
     function toStats() { go(true); syncHash(true); }
-    function toHub()   { go(false); syncHash(false); }
+    function toHub()   { closeDetail(true); go(false); syncHash(false); }
 
     document.getElementById('to-stats').addEventListener('click', function (e) { e.preventDefault(); toStats(); });
     document.getElementById('to-hub').addEventListener('click', function (e) { e.preventDefault(); toHub(); });
     // react to external hash changes (e.g. the stats.html redirect, or a pasted #stats link)
-    window.addEventListener('hashchange', function () { var s = location.hash === '#stats'; go(s); syncHash(s); });
+    window.addEventListener('hashchange', function () { applyHash(); });
+    function applyHash() {
+      var h = location.hash, s = h.indexOf('#stats') === 0;
+      var m = h.match(/^#stats\/(.+)$/);
+      go(s);
+      if (s && m) openDetail(decodeURIComponent(m[1]), true); else closeDetail(true);
+      syncHash(s);
+    }
     window.addEventListener('resize', setHeight);
     window.addEventListener('load', setHeight);
 
@@ -494,8 +748,8 @@
       }
     }, { passive: true });
 
-    // initial state (supports opening directly on #stats)
-    go(location.hash === '#stats');
+    // initial state (supports opening directly on #stats or #stats/<app>)
+    applyHash();
   })();
   </script>
   <!-- hub-stats visit counter -->
