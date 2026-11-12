@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Spilsmedjen</title>
+<style>
+  :root{
+    --bg:#f6f1ea; --panel:#fffaf3; --edge:#e2d6c6; --ink:#2a2118; --muted:#6b5b4a;
+    --ember:#b4470f; --ember-bg:#fbe3d3; --gold:#8a6100; --ok:#1d7a46; --bad:#b3261e;
+    --line:#b4470f; --grid:#e8ddcf; --btn-ink:#fff;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14100c; --panel:#1f1914; --edge:#3a2f25; --ink:#f3e9dc; --muted:#bcaa96;
+      --ember:#ff9a5a; --ember-bg:#3a2214; --gold:#ffd27a; --ok:#6fe0a1; --bad:#ff8a80;
+      --line:#ff9a5a; --grid:#2e251d; --btn-ink:#1a120b;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100svh}
+  main{max-width:720px;margin:0 auto;padding:20px 16px 60px}
+  h1{font-size:28px;margin:6px 0 2px;letter-spacing:.5px}
+  h2{font-size:18px;margin:0 0 10px}
+  .sub{color:var(--muted);margin:0 0 18px}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:16px;padding:16px;margin-bottom:14px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .muted{color:var(--muted);font-size:14px}
+  .chip{display:inline-block;padding:3px 10px;border-radius:99px;font-size:13px;background:var(--ember-bg);color:var(--ink);border:1px solid var(--edge)}
+  .chip.ok{color:var(--ok)} .chip.bad{color:var(--bad)}
+  button,.btn{font:inherit;border:0;border-radius:12px;padding:11px 16px;background:var(--ember);color:var(--btn-ink);font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--edge)}
+  button:disabled{opacity:.5}
+  input,textarea{font:inherit;font-size:16px;width:100%;padding:12px;border-radius:12px;border:1px solid var(--edge);background:var(--bg);color:var(--ink)}
+  textarea{min-height:90px;resize:vertical}
+  .meter{height:10px;border-radius:99px;background:var(--grid);overflow:hidden;flex:1;min-width:120px}
+  .meter>i{display:block;height:100%;background:var(--ember)}
+  ul{margin:6px 0 0;padding-left:20px} li{margin:2px 0}
+  .night h3{margin:0 0 4px;font-size:17px}
+  .night .lbl{font-weight:600;font-size:14px;margin-top:10px;color:var(--gold)}
+  .comment{border-top:1px solid var(--edge);padding:10px 0}
+  .comment:first-child{border-top:0}
+  .reply{margin-top:6px;padding:8px 10px;border-radius:10px;background:var(--ember-bg)}
+  .scores{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:10px}
+  .scores div{display:flex;justify-content:space-between;gap:8px;font-size:14px;padding:4px 8px;border-radius:8px;background:var(--bg);border:1px solid var(--edge)}
+  svg text{fill:var(--muted);font-size:11px}
+  #gate{max-width:360px;margin:18vh auto 0;text-align:center}
+  .hidden{display:none!important}
+  a{color:var(--ember)}
+  details summary{cursor:pointer;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+  <div id="gate" class="card">
+    <h1>Spilsmedjen</h1>
+    <p class="sub">Skriv koden</p>
+    <form id="gateform"><input id="code" type="password" autocomplete="current-password" placeholder="kode"><p></p><button>Åbn</button></form>
+    <p id="gateerr" class="muted"></p>
+  </div>
+
+  <div id="app" class="hidden">
+    <h1>Spilsmedjen</h1>
+    <p class="sub">En spiludvikler, der arbejder om natten og bliver bedre for hver nat.</p>
+
+    <section class="card" id="status"></section>
+    <section class="card" id="game"></section>
+    <section class="card" id="judge"></section>
+    <section class="card">
+      <h2>Skriv til smeden</h2>
+      <p class="muted">Den læser dine beskeder først hver nat og svarer her.</p>
+      <textarea id="msg" placeholder="Fx: kampene er for lange, eller: jeg elsker de glimtende kort"></textarea>
+      <p></p><button id="send">Send</button> <span id="sent" class="muted"></span>
+      <div id="comments" style="margin-top:12px"></div>
+    </section>
+    <h2 style="margin:22px 0 10px">Nætterne</h2>
+    <div id="nights"></div>
+    <p class="muted" style="text-align:center;margin-top:30px"><a href="./">‹ Bording Hub</a></p>
+  </div>
+</main>
+<script>
+const API = "https://spilsmedjen-api.mathiasjob.workers.dev";
+const KEY = "smedje_code";
+let code = "";
+try { code = localStorage.getItem(KEY) || ""; } catch (e) {}
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const when = (ts) => ts ? new Date(ts).toLocaleString("da-DK", {weekday:"short", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"}) : "";
+const list = (arr) => (arr && arr.length) ? "<ul>" + arr.map((x) => "<li>" + esc(x) + "</li>").join("") + "</ul>" : "";
+
+async function api(path, body) {
+  const r = await fetch(API + path, {
+    method: body ? "POST" : "GET",
+    headers: {"Content-Type": "application/json", "X-Smedje-Code": code},
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (r.status === 401) throw new Error("kode");
+  return r.json();
+}
+
+function meter(label, v) {
+  const n = Math.max(0, Math.min(100, Number(v) || 0));
+  return `<div class="row" style="margin-top:6px"><span style="width:110px" class="muted">${label}</span><div class="meter"><i style="width:${n}%"></i></div><span class="muted" style="width:44px;text-align:right">${n.toFixed(0)}%</span></div>`;
+}
+
+function renderStatus(s) {
+  const hb = s.heartbeat;
+  const fresh = hb && (Date.now() - new Date(hb.ts)) < 45 * 60000;
+  const st = hb ? hb.status : "aldrig set";
+  $("status").innerHTML = `
+    <div class="row" style="justify-content:space-between">
+      <div><span class="chip ${fresh ? "ok" : "bad"}">${fresh ? "● " + esc(st) : "○ ikke set i et stykke tid"}</span>
+      <div class="muted" style="margin-top:4px">Sidst set: ${esc(when(hb && hb.ts))}</div></div>
+      <button id="runnow" ${s.run_now ? "disabled" : ""}>${s.run_now ? "Starter snart…" : "Kør nu"}</button>
+    </div>
+    ${hb ? meter("Ugens kvote", hb.seven_day) + meter("5-timers kvote", hb.five_hour) : ""}
+    <p class="muted" style="margin:8px 0 0">Den stopper selv ved 85 %, og kører kun på dit abonnement. «Kør nu» starter en vagt inden for 2 minutter.</p>`;
+  $("runnow").onclick = async () => { $("runnow").disabled = true; await api("/run-now", {}); load(); };
+}
+
+function renderGame(s) {
+  const g = s.game;
+  $("game").innerHTML = g && g.url
+    ? `<h2>${esc(g.navn || "Spillet")}</h2>
+       <div class="row"><a class="btn" href="${esc(g.url)}">Spil det ▸</a>
+       <span class="muted">version ${esc(g.version || "?")} · ${s.players_7d} spillere sidste 7 dage</span></div>`
+    : `<h2>Spillet</h2><p class="muted" style="margin:0">Intet spil endnu. De første nætter bruger smeden på at researche, sætte værktøjer op og designe spillet.</p>`;
+}
+
+function chart(points) {
+  const W = 640, H = 170, P = 26;
+  if (!points.length) return "";
+  const x = (i) => P + (points.length === 1 ? (W - 2 * P) / 2 : i * (W - 2 * P) / (points.length - 1));
+  const y = (v) => H - P - (v - 1) / 9 * (H - 2 * P);
+  let grid = "";
+  for (const v of [1, 4, 7, 10]) grid += `<line x1="${P}" x2="${W - P}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="4" y="${y(v) + 4}">${v}</text>`;
+  const path = points.map((p, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p.overall).toFixed(1)).join(" ");
+  const dots = points.map((p, i) => `<circle cx="${x(i)}" cy="${y(p.overall)}" r="4" fill="var(--line)"><title>${esc(when(p.ts))}: ${p.overall}</title></circle>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Dommerens samlede point over tid">${grid}<path d="${path}" fill="none" stroke="var(--line)" stroke-width="2.5"/>${dots}</svg>`;
+}
+
+const LABELS = {forstaaelse:"Forståelse", pakkeglaede:"Pakkeglæde", kombinationer:"Kombinationer", beslutninger:"Beslutninger", verden:"Verden", maal:"Mål", foelelse:"Følelse", udseende:"Udseende", mobil:"Mobil", fejlfri:"Fejlfri"};
+function renderJudge(s) {
+  const j = s.judge || [];
+  if (!j.length) { $("judge").innerHTML = `<h2>Dommeren</h2><p class="muted" style="margin:0">En uafhængig dommer spiller spillet hver nat som en fremmed og giver point. Kurven dukker op, når spillet findes.</p>`; return; }
+  const last = j[j.length - 1];
+  const sc = last.scores || {};
+  $("judge").innerHTML = `<h2>Dommeren · seneste ${esc(last.overall)}/10</h2>${chart(j)}
+    <div class="scores">${Object.keys(LABELS).map((k) => `<div><span>${LABELS[k]}</span><b>${esc(sc[k] ?? "–")}</b></div>`).join("")}</div>
+    ${last.bedst ? `<div class="night"><div class="lbl">Bedst</div>${esc(last.bedst)}</div>` : ""}
+    ${last.vaerst ? `<div class="night"><div class="lbl">Holder det tilbage</div>${esc(last.vaerst)}</div>` : ""}
+    ${last.raad && last.raad.length ? `<div class="night"><div class="lbl">Dommerens råd</div>${list(last.raad)}</div>` : ""}`;
+}
+
+function renderComments(s) {
+  $("comments").innerHTML = (s.comments || []).map((c) => `
+    <div class="comment"><div class="muted">${esc(when(c.ts))} · ${c.read_at ? "læst" : "venter på i nat"}</div>
+    <div>${esc(c.text)}</div>${c.reply ? `<div class="reply"><b>Smeden:</b> ${esc(c.reply)}</div>` : ""}</div>`).join("");
+}
+
+const TYPES = {opstart:"Opstart", byg:"Byggenat", forskning:"Forskningsnat", egenudvikling:"Egen udvikling"};
+function renderNights(s) {
+  const n = s.shifts || [];
+  $("nights").innerHTML = n.length ? n.map((r) => `
+    <article class="card night">
+      <div class="muted">${esc(r.dato || when(r.ts))} · ${esc(TYPES[r.type] || r.type || "")}${r.nat ? " · nat " + esc(r.nat) : ""}</div>
+      <h3>${esc(r.titel || "Nattens arbejde")}</h3>
+      <div>${esc(r.resume || "")}</div>
+      ${r.opdateringsnoter && r.opdateringsnoter.length ? `<div class="lbl">Opdateringsnoter</div>${list(r.opdateringsnoter)}` : ""}
+      ${r.laert && r.laert.length ? `<div class="lbl">Hvad den lærte</div>${list(r.laert)}` : ""}
+      ${r.problemer && r.problemer.length ? `<div class="lbl">Problemer</div>${list(r.problemer)}` : ""}
+      ${r.naeste && r.naeste.length ? `<details><summary>Næste gang</summary>${list(r.naeste)}</details>` : ""}
+    </article>`).join("") : `<p class="muted">Ingen nætter endnu.</p>`;
+}
+
+async function load() {
+  try {
+    const s = await api("/state");
+    $("gate").classList.add("hidden"); $("app").classList.remove("hidden");
+    renderStatus(s); renderGame(s); renderJudge(s); renderComments(s); renderNights(s);
+  } catch (e) {
+    $("app").classList.add("hidden"); $("gate").classList.remove("hidden");
+    if (e.message === "kode") { $("gateerr").textContent = code ? "Forkert kode" : ""; }
+    else $("gateerr").textContent = "Kunne ikke hente data. Prøv igen om lidt.";
+  }
+}
+
+$("gateform").onsubmit = (e) => { e.preventDefault(); code = $("code").value.trim(); try { localStorage.setItem(KEY, code); } catch (_) {} load(); };
+$("send").onclick = async () => {
+  const t = $("msg").value.trim(); if (!t) return;
+  $("send").disabled = true;
+  try { await api("/comment", {text: t}); $("msg").value = ""; $("sent").textContent = "Sendt ✓"; load(); }
+  catch (e) { $("sent").textContent = "Kunne ikke sende"; }
+  $("send").disabled = false;
+};
+if (code) load();
+</script>
+</body>
+</html>
