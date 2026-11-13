@@ -262,6 +262,7 @@
   <script>
     // Inline line-icons (stroke = currentColor) — render identically everywhere, no emoji/icon-font needed.
     const ICONS = {
+      pen: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/>',
       atom:'<circle cx="12" cy="12" r="2.2"/><ellipse cx="12" cy="12" rx="10" ry="4.4"/><ellipse cx="12" cy="12" rx="10" ry="4.4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.4" transform="rotate(120 12 12)"/>',
       bird:'<path d="M3 13c3-2.5 6-2.5 9 0M3 13c3 2.5 6 2.5 9 0M21 9c-3-2.5-6-2.5-9 0M21 9c-3 2.5-6 2.5-9 0"/>',
       flame:'<path d="M12 21a6 6 0 0 0 6-6c0-4-4-6-4.5-10C11 7 11 9 9.5 10.5 8.7 9.8 8.5 8.6 8.5 7.6 6.8 9 6 11.5 6 15a6 6 0 0 0 6 6z"/>',
@@ -333,6 +334,7 @@
         { name: 'Lull', icon: 'moon', desc: 'Alt til babyens søvn i én app. Søvn, mad og bleer med ét tryk, plus et kvalificeret bud på næste lur, der blander aldersnormale vågne-vinduer med dit barns egne. Døgnet som en cirkel, mønster- og vækstgrafer (WHO). Nat-fanen har søvnlyde og en babyalarm mellem to telefoner (krypteret direkte mellem telefonerne, hyler hvis forbindelsen dør). Guide-fanen giver søvnråd efter barnets alder, skrevet ud fra Sundhedsstyrelsen og med kilder. Virker offline.', url: 'https://bordingcode.github.io/lull/' },
         { name: 'Secret Santa', icon: 'gift', desc: 'Træk lod til pakkeleg.', url: 'https://bordingcode.github.io/secret-santa/' },
         { name: 'Brugt er godt', icon: 'tag', desc: 'Udstillingsvindue for brugte ting — keramik, lamper, møbler og mere. Se varerne, kontakt via email/telefon/MobilePay, eller læg flere i kurven og giv et samlet bud.', url: 'https://brugtergodt.pages.dev/' },
+        { name: 'Ansøgeren', icon: 'pen', desc: 'Skriv jobansøgninger og CV på telefonen — importér dine gamle .docx-filer, skriv i en enkel editor, og få dem sat pænt op som PDF eller Word. Claude hjælper (via Pi\'en): skriver udkast ud fra jobopslaget, retter sprog, tilpasser CV\'et og giver ærlig feedback. Låst med kode.', url: 'https://bordingcode.github.io/ansoeger/' },
         { name: 'Hint-kort', icon: 'cards', desc: 'Lav dine egne kort til partyspillet HINT — skriv kortene i en mail, få et printklart PDF-ark retur. Tryk her for at åbne en ny mail med skabelonen (skriv "Hint" i emnet).', url: 'mailto:mathiasjobbot@gmail.com?subject=Hint&body=Skriv%20hvert%20kort%20med%208%20linjer.%20Saet%20en%20tom%20linje%20mellem%20hvert%20kort.%0A%0ALinje%201%3A%20aktivitet%20%28Tegne%2C%20Mime%2C%20Tale%20eller%20Nynne%29%0ALinje%202%3A%20tema%0ALinje%203%3A%20det%20forbudte%20ord%0ALinje%204-8%3A%20de%20fem%20ord%20der%20skal%20gaettes%0A%0AEksempel%20%28slet%20dette%20og%20skriv%20dine%20egne%29%3A%0A%0ATegne%0ATing%20der%20flyver%0ALuftskib%0APil%0AHelikopter%0APelikan%0ATid%0ADrone' },
       ]},
     ];
@@ -462,7 +464,7 @@
       'podwalk': 'Podwalk', 'hylden': 'Hylden', 'grimoire': 'Grimoire',
       'crimpedia': 'Crimpedia', 'baby-sleep': 'Baby Sleep', 'secret-santa': 'Secret Santa',
       'lull': 'Lull', 'holo': 'HOLO', 'brugtergodt': 'Brugt er godt', 'offleash': 'OFF-LEASH', '13-0': '13-0',
-      'cutefight': 'Cute Fight', 'hexfall': 'Hexfall'
+      'cutefight': 'Cute Fight', 'hexfall': 'Hexfall', 'ansoeger': 'Ansøgeren'
     };
 
     function setHeight() {
